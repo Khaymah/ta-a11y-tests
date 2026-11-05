@@ -1,0 +1,53 @@
+name: Accessibility tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: Site to test
+        default: https://ta.muslimgate.org
+      only:
+        description: Page slugs, comma separated (empty = all)
+        default: ''
+  schedule:
+    - cron: '17 4 * * 0'
+  pull_request:
+
+concurrency:
+  group: a11y-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  a11y:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TA_BASE_URL: ${{ inputs.base_url || 'https://ta.muslimgate.org' }}
+      TA_ONLY: ${{ inputs.only || '' }}
+      TA_WORKERS: '2'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx playwright install --with-deps chromium
+
+      - run: npm run typecheck
+
+      - run: npm test
+
+      - name: Arabic report in the job summary
+        if: always()
+        run: test -f reports/A11yReport.md && cat reports/A11yReport.md >> "$GITHUB_STEP_SUMMARY" || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: a11y-reports
+          path: reports/
+          retention-days: 30

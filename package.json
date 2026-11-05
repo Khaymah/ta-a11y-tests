@@ -1,0 +1,27 @@
+{
+  "name": "ta-a11y-tests",
+  "version": "1.0.0",
+  "description": "Accessibility test suite for the Ta platform (ta.muslimgate.org)",
+  "scripts": {
+    "test": "playwright test",
+    "test:desktop": "playwright test --project=desktop",
+    "test:axe": "playwright test tests/Axe.spec.ts",
+    "test:keyboard": "playwright test tests/Keyboard.spec.ts",
+    "test:player": "playwright test tests/AudioPlayer.spec.ts",
+    "test:mushaf": "playwright test tests/MediaAndControls.spec.ts -g mushaf",
+    "test:local": "TA_BASE_URL=http://localhost:3000 playwright test",
+    "report": "playwright show-report reports/html",
+    "typecheck": "tsc --noEmit"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^22.20.5",
+    "typescript": "^5.6.3"
+  },
+  "private": true,
+  "overrides": {
+    "playwright-core": "1.63.0"
+  }
+}
